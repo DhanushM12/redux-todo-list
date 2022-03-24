@@ -34,6 +34,39 @@ app.post('/api/sign', (req, res) => {
 })
 
 
+app.post('/api/verify', takeToken, (req, res) => {
+    jwt.verify(req.token, 'secret', (err, data) => {
+        if(err){
+            res.sendStatus(403);
+        }
+        else{
+            res.json({
+                message: 'User access granted',
+                data
+            })
+        }
+    })
+}) 
+
+//middleware to get the token from request headers
+// Authorization: Bearer token
+function takeToken(req, res, next){
+    const bearerHeader = req.headers['authorization'];
+    if(typeof bearerHeader !== undefined){
+        const bearer = bearerHeader.split(' ');
+        const bearerToken = bearer[1];
+        req.token = bearerToken;
+        next();
+    }
+    else{
+        res.sendStatus(403);
+    }
+}
+
+
+
+
+
 app.listen(port, function(err){
     if(err){
         console.log(`Error in running the server : ${err}`)
